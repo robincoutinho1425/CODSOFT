@@ -1,0 +1,185 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+class Book {
+private:
+    int id;
+    std::string title;
+    std::string author;
+    bool isIssued;
+
+public:
+    Book(int bookId, std::string bookTitle, std::string bookAuthor)
+        : id(bookId), title(bookTitle), author(bookAuthor), isIssued(false) {}
+
+    int getId() const { return id; }
+    std::string getTitle() const { return title; }
+    std::string getAuthor() const { return author; }
+    bool getIsIssued() const { return isIssued; }
+
+    void issueBook() { isIssued = true; }
+    void returnBook() { isIssued = false; }
+
+    void displayBookInfo() const {
+        std::cout << "ID: " << id << ", Title: " << title 
+                  << ", Author: " << author << ", Issued: " 
+                  << (isIssued ? "Yes" : "No") << std::endl;
+    }
+};
+
+class Member {
+private:
+    int memberId;
+    std::string name;
+
+public:
+    Member(int id, std::string memberName)
+        : memberId(id), name(memberName) {}
+
+    int getMemberId() const { return memberId; }
+    std::string getName() const { return name; }
+
+    void displayMemberInfo() const {
+        std::cout << "Member ID: " << memberId << ", Name: " << name << std::endl;
+    }
+};
+
+class Library {
+private:
+    std::vector<Book> books;
+    std::vector<Member> members;
+
+public:
+    void addBook(const Book& book) {
+        books.push_back(book);
+    }
+
+    void addMember(const Member& member) {
+        members.push_back(member);
+    }
+
+    void issueBook(int bookId, int memberId) {
+        for (auto& book : books) {
+            if (book.getId() == bookId) {
+                if (!book.getIsIssued()) {
+                    book.issueBook();
+                    std::cout << "Book issued successfully to member ID " << memberId << std::endl;
+                } else {
+                    std::cout << "Book already issued." << std::endl;
+                }
+                return;
+            }
+        }
+        std::cout << "Book not found." << std::endl;
+    }
+
+    void returnBook(int bookId) {
+        for (auto& book : books) {
+            if (book.getId() == bookId) {
+                if (book.getIsIssued()) {
+                    book.returnBook();
+                    std::cout << "Book returned successfully." << std::endl;
+                } else {
+                    std::cout << "Book was not issued." << std::endl;
+                }
+                return;
+            }
+        }
+        std::cout << "Book not found." << std::endl;
+    }
+
+    void displayAllBooks() const {
+        for (const auto& book : books) {
+            book.displayBookInfo();
+        }
+    }
+
+    void displayAllMembers() const {
+        for (const auto& member : members) {
+            member.displayMemberInfo();
+        }
+    }
+};
+
+void displayMenu() {
+    std::cout << "\nLibrary Management System Menu:\n";
+    std::cout << "1. Add Book\n";
+    std::cout << "2. Add Member\n";
+    std::cout << "3. Display All Books\n";
+    std::cout << "4. Display All Members\n";
+    std::cout << "5. Issue Book\n";
+    std::cout << "6. Return Book\n";
+    std::cout << "7. Exit\n";
+    std::cout << "Enter your choice: ";
+}
+
+int main() {
+    Library library;
+    int choice;
+
+    do {
+        displayMenu();
+        std::cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                int id;
+                std::string title, author;
+                std::cout << "Enter book ID: ";
+                std::cin >> id;
+                std::cin.ignore(); // to ignore the newline character left in the buffer
+                std::cout << "Enter book title: ";
+                std::getline(std::cin, title);
+                std::cout << "Enter book author: ";
+                std::getline(std::cin, author);
+                library.addBook(Book(id, title, author));
+                break;
+            }
+            case 2: {
+                int id;
+                std::string name;
+                std::cout << "Enter member ID: ";
+                std::cin >> id;
+                std::cin.ignore(); // to ignore the newline character left in the buffer
+                std::cout << "Enter member name: ";
+                std::getline(std::cin, name);
+                library.addMember(Member(id, name));
+                break;
+            }
+            case 3: {
+                library.displayAllBooks();
+                break;
+            }
+            case 4: {
+                library.displayAllMembers();
+                break;
+            }
+            case 5: {
+                int bookId, memberId;
+                std::cout << "Enter book ID to issue: ";
+                std::cin >> bookId;
+                std::cout << "Enter member ID to issue to: ";
+                std::cin >> memberId;
+                library.issueBook(bookId, memberId);
+                break;
+            }
+            case 6: {
+                int bookId;
+                std::cout << "Enter book ID to return: ";
+                std::cin >> bookId;
+                library.returnBook(bookId);
+                break;
+            }
+            case 7: {
+                std::cout << "Exiting the system." << std::endl;
+                break;
+            }
+            default: {
+                std::cout << "Invalid choice. Please try again." << std::endl;
+            }
+        }
+    } while (choice != 7);
+
+    return 0;
+}
